@@ -44,7 +44,7 @@ namespace TicketToRide.Classes
 
             for (int i = 0; i < count; i++)
             {
-                cards.Add(new TrainCard() { Color = color } );
+                cards.Add(new TrainCard() { Color = color });
             }
 
             return cards;
