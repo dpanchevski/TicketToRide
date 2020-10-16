@@ -414,5 +414,101 @@ namespace TicketToRide.Classes
 
             Console.WriteLine(Name + " draws new destination cards!");
         }
+
+        public void OutputPlayerSummary()
+        {
+            // Player name and color
+            Console.WriteLine("Name: " + Name + ", Color: " + Color.ToString() + ", Remaining Trains: " + RemainingTrainCars.ToString());
+
+            // For each destination card, output them
+            Console.WriteLine("Destination Cards: ");
+
+            foreach (var destinationCard in DestinationCards)
+            {
+                Console.WriteLine(destinationCard.Origin.ToString() + " to " + destinationCard.Destination.ToString() + ", " + destinationCard.PointValue + " points");
+            }
+
+            Console.WriteLine("Desired Routes: ");
+
+            foreach (var desiredRoute in TargetedRoutes)
+            {
+                Console.WriteLine(desiredRoute.Origin + " to " + desiredRoute.Destination + " (" + desiredRoute.Color + "), " + desiredRoute.PointValue + " points");
+            }
+
+            Console.WriteLine("Desired Colors: ");
+
+            var colorList = string.Empty;
+
+            foreach (var color in DesiredColors)
+            {
+                colorList += color + ", ";
+            }
+
+            if (colorList.Contains(","))
+                colorList = colorList.Remove(colorList.LastIndexOf(",", StringComparison.Ordinal));
+
+            Console.WriteLine(colorList);
+
+            Console.WriteLine("Current Hand:");
+
+            var groups = Hand.GroupBy(x => x.Color)
+                .Select(x => new
+                {
+                    Color = x.Key,
+                    Count = x.Count()
+                })
+                .OrderByDescending(x => x.Count);
+
+            foreach (var cards in groups)
+            {
+                Console.WriteLine(cards.Color + " x " + cards.Count);
+            }
+
+            Console.WriteLine("");
+        }
+
+        public void CalculateScore()
+        {
+            // First we must get combined score of all claimed routes
+            var claimedRouteScore = Board.Routes.Routes.Where(x => x.IsOccupied && x.OccupyingPlayerColor == Color).Sum(x => x.PointValue);
+
+            var routes = Board.Routes.Routes.Where(x => x.IsOccupied && x.OccupyingPlayerColor == Color).ToList();
+
+            foreach (var route in routes)
+            {
+                Console.WriteLine(Name + " claimed the route " + route.Origin + " to " + route.Destination + ", worth " + route.PointValue + " points!");
+            }
+
+            // For each destination card we add the point value if the card is complete and subtract if they are not
+            foreach (var card in DestinationCards)
+            {
+                var output = Name + " has the destination card " + card.Origin + " to " + card.Destination;
+
+                var isConnected = Board.Routes.IsAlreadyConnected(card.Origin, card.Destination, Color);
+
+                if (isConnected)
+                {
+                    claimedRouteScore += card.PointValue;
+                    output += " (SUCCEEDED)";
+                }
+                else
+                {
+
+                    claimedRouteScore -= card.PointValue;
+                    output += " (FAILED)";
+                }
+
+                Console.WriteLine(output);
+
+                Board.Routes.AlreadyCheckedCities.Clear();
+            }
+
+            Console.WriteLine(Name + " scored " + claimedRouteScore.ToString() + " points!");
+
+            if (claimedRouteScore == 0)
+            {
+                Console.WriteLine("Please congratulate " + Name + " on having a \"perfect\" game!");
+            }
+        }
     }
 }

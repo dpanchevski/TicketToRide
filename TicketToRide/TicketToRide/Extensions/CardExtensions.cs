@@ -92,7 +92,7 @@ namespace TicketToRide.Extensions
             Random r = new Random();
 
             // Step 1: For each unshuffled item in the collection
-            for (int n = cards.Count; n > 0; --n)
+            for (int n = cards.Count - 1; n > 0; --n)
             {
                 // Step 2: Randomly pic an item which has not been shuffled
                 int k = r.Next(n + 1);
@@ -111,7 +111,7 @@ namespace TicketToRide.Extensions
             Random r = new Random();
 
             // Step 1: For each unshuffled item in the collection
-            for (int n = cards.Count; n > 0; --n)
+            for (int n = cards.Count - 1; n > 0; --n)
             {
                 // Step 2: Randomly pic an item which has not been shuffled
                 int k = r.Next(n + 1);
