@@ -25,7 +25,7 @@ namespace TicketToRide.Classes
                 };
             }
         }
-        public PlayerColor? OccupingPlayerColor { get; set; } // If not null, is the color of the player who has claimed this route
+        public PlayerColor? OccupyingPlayerColor { get; set; } // If not null, is the color of the player who has claimed this route
 
         public BoardRoute(City origin, City destination, TrainColor color, int length)
         {

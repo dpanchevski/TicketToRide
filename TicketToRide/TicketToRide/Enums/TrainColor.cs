@@ -10,7 +10,7 @@
         Purple,
         Black,
         White,
-        Locomotive, //Only used for cards
-        Grey //Only used for board spaces
+        Locomotive, // Only used for cards
+        Grey // Only used for board spaces
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TicketToRide.Enums;
 using TicketToRide.Extensions;
 
@@ -36,18 +37,6 @@ namespace TicketToRide.Classes
             deck.Shuffle();
 
             Deck = deck;
-        }
-
-        private List<TrainCard> CreateSingleColorCollection(TrainColor color, int count)
-        {
-            List<TrainCard> cards = new List<TrainCard>();
-
-            for (int i = 0; i < count; i++)
-            {
-                cards.Add(new TrainCard() { Color = color });
-            }
-
-            return cards;
         }
 
         private void CreateDestinationCards()
@@ -194,6 +183,61 @@ namespace TicketToRide.Classes
             Routes.AddRoute(City.Atlanta, City.Miami, TrainColor.Blue, 5);
             Routes.AddRoute(City.Charleston, City.Miami, TrainColor.Purple, 4);
             #endregion
+        }
+
+        private List<TrainCard> CreateSingleColorCollection(TrainColor color, int count)
+        {
+            List<TrainCard> cards = new List<TrainCard>();
+
+            for (int i = 0; i < count; i++)
+            {
+                cards.Add(new TrainCard() { Color = color });
+            }
+
+            return cards;
+        }
+        
+        public void PopulateShownCards()
+        {
+            if (Deck.Count < 10)
+            {
+                // Shuffle the discard pile into the deck
+                var allCards = DiscardPile;
+
+                allCards.AddRange(Deck.Pop(Deck.Count));
+
+                allCards.Shuffle();
+
+                Deck = allCards;
+
+                DiscardPile = new List<TrainCard>();
+            }
+
+            FlipShownCards();
+
+            var locomotiveCount = ShownCards.Count(x => x.Color == TrainColor.Locomotive);
+
+            while (locomotiveCount >= 3)
+            {
+                Console.WriteLine("Shown cards has 3 or more locomotives! Burning the shown cards.");
+
+                // Discard the shown cards
+                DiscardPile.AddRange(ShownCards);
+                ShownCards = new List<TrainCard>();
+
+                // Add a new set of shown cards
+                FlipShownCards();
+                locomotiveCount = ShownCards.Count(x => x.Color == TrainColor.Locomotive);
+            }
+        }
+
+        private void FlipShownCards()
+        {
+            while (ShownCards.Count < 5)
+            {
+                var newCard = Deck.Pop(1);
+                ShownCards.AddRange(newCard);
+            }
         }
     }
 }

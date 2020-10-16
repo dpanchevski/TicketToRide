@@ -1,12 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using TicketToRide.Classes;
+using TicketToRide.Enums;
 
 namespace TicketToRide.Extensions
 {
     public static class CardExtensions
     {
+        public static List<TrainCard> GetMatching(this List<TrainCard> cards, TrainColor color, int count)
+        {
+            if (cards.Count(x => x.Color == color) >= count)
+            {
+                var selectedCards = cards.Where(x => x.Color == color).Take(count).ToList();
+
+                foreach (var card in selectedCards)
+                {
+                    cards.Remove(card);
+                }
+
+                return selectedCards;
+            }
+
+            return new List<TrainCard>();
+        }
+
         // The following two methods can be implemented with Stack<T> or Queue<T>, but why not as a list :D (change if you have time)
         public static List<TrainCard> Pop(this List<TrainCard> cards, int count)
         {
@@ -33,6 +52,38 @@ namespace TicketToRide.Extensions
             }
 
             return returnCards;
+        }
+
+        public static TrainColor GetMostPopularColor(this List<TrainCard> cards, List<TrainColor> desiredColors)
+        {
+            if (!cards.Any())
+                return TrainColor.Locomotive;
+
+            var colors = cards.Where(x => x.Color != TrainColor.Locomotive)
+                .GroupBy(x => x.Color)
+                .Select(group => new
+                {
+                    Color = group.Key,
+                    Count = group.Count()
+                })
+                .OrderByDescending(x => x.Count)
+                .Select(x => x.Color)
+                .ToList();
+
+            var selectedColor = colors.First();
+
+            var otherColors = colors.Except(desiredColors);
+
+            if (otherColors.Any())
+            {
+                while (desiredColors.Contains(selectedColor))
+                {
+                    colors.Remove(selectedColor);
+                    selectedColor = colors.First();
+                }
+            }
+
+            return selectedColor;
         }
 
         // Modern method of the Fisher-Yates algorithm - O(n)
